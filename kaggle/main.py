@@ -3,7 +3,7 @@ import subprocess
 
 # Clone the repository
 subprocess.run(
-    ["git", "clone", "--branch", "text", "--single-branch", "https://github.com/chris-mrn/Teach2Teach.git"],
+    ["git", "clone", "--branch", "main", "--single-branch", "https://github.com/chris-mrn/Teach2Teach.git"],
     check=True,
 )
 os.chdir("Teach2Teach")
@@ -17,6 +17,8 @@ subprocess.run(
     [
         "python",
         "main.py",
+        "--device",
+        device,
     ],
     check=True,
 )

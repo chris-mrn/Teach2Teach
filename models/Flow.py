@@ -31,9 +31,7 @@ class GaussFlowMatching_OT:
 
                 optimizer.zero_grad()
                 loss = self.loss_fn(self.flow(x_t, t), dx_t)
-                print('1')
                 loss.backward()
-                print('2')
                 optimizer.step()
 
             print(f"Epoch {epoch+1}/{n_epochs} - Loss: {loss.item():.6f}")
