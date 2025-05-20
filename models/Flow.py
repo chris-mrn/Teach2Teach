@@ -45,6 +45,8 @@ class GaussFlowMatching_OT:
     def step(self, x_t, t_start, t_end):
         t_start = t_start.view(-1, 1).to(self.device)
         t_end = t_end.view(-1, 1).to(self.device)
+        t_start = t_start.view(-1, 1, 1, 1)
+        t_end = t_end.view(-1, 1, 1, 1)
         mid_t = t_start + (t_end - t_start) / 2
 
         midpoint = x_t + self.flow(x_t, t_start) * (t_end - t_start) / 2
