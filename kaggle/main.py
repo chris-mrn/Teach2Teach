@@ -3,7 +3,7 @@ import subprocess
 
 # Clone the repository
 subprocess.run(
-    ["git", "clone", "--branch", "text", "--single-branch", "https://github.com/LounesMD/LLaDA_Arithmetic.git"],
+    ["git", "clone", "--branch", "text", "--single-branch", "https://github.com/chris-mrn/Teach2Teach.git"],
     check=True,
 )
 os.chdir("LLaDA_Arithmetic")
