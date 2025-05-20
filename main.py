@@ -40,7 +40,8 @@ def main():
     model_FM.train(optimizer_fm, dataloader1 , dataloader0 , n_epochs=1)
     gen_FM_samples, hist_FM = model_FM.sample_from(X0[:10])
 
-    show_images(gen_FM_samples, title="Flow Matching Samples")
+    # Show and save FM samples
+    show_images(gen_FM_samples, title="FM Samples", save_path="outputs/gen_FM_samples.png")
 
 
     net_score = Unet()
