@@ -2,10 +2,13 @@ import torch
 import torch.nn as nn
 import torchvision
 from net.unet import Unet
+from net.NoiseNet import NoiseUnet
 from models.Flow import GaussFlowMatching_OT
 from models.Score import NCSN
+from models.NoiseLearner import NoiseLearner
 import torchvision.transforms as transforms
 from utils import parse_arguments, show_images
+
 
 
 def main():
@@ -37,20 +40,23 @@ def main():
     net_score = Unet()
     model_score = NCSN(net_score, L=10, device=args.device)
     optimizer_score = torch.optim.Adam(net_score.parameters(), 1e-3)
-    model_score.train(optimizer_score, epochs=1, dataloader=dataloader1, print_interval=10)
+    model_score.train(optimizer_score, epochs=10, dataloader=dataloader1, print_interval=10)
     gen_score_samples, hist_score = model_score.sample_from(X0[:10])
 
-    show_images(gen_score_samples, title="Score Matching Samples")
 
     net_fm = Unet()
     model_FM = GaussFlowMatching_OT(net_fm, device=args.device)
     optimizer_fm = torch.optim.Adam(net_fm.parameters(), 1e-3)
-    model_FM.train(optimizer_fm, dataloader1 , dataloader0 , n_epochs=10)
+    model_FM.train(optimizer_fm, dataloader1 , dataloader0 , n_epochs=1)
     gen_FM_samples, hist_FM = model_FM.sample_from(X0[:10])
 
     # Show and save FM samples
+    show_images(gen_score_samples, title="Score Matching Samples")
     show_images(gen_FM_samples, title="FM Samples", save_path="outputs/gen_FM_samples.png")
 
+    net_noise = NoiseUnet()
+    net_recon = Unet()
+    model = NoiseLearner(net_noise, net_recon, L=10, device=args.device)
 
 
 if __name__ == "__main__":
