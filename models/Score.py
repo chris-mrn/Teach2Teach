@@ -24,6 +24,8 @@ class NCSN:
                 alpha_i = eps * self.sigma[i] ** 2 / self.sigma[-1] ** 2
                 for _ in range(T):
                     noise_level = self.sigma[i].expand(x_step.shape[0], 1)
+                    # adapt to x shape
+                    noise_level = noise_level.view(-1, 1, 1, 1)
                     x_step = x_step + alpha_i / 2 * self.model(x_step, noise_level) / noise_level \
                              + torch.sqrt(alpha_i) * torch.randn_like(x_step)
                 x_hist[i + 1] = x_step
