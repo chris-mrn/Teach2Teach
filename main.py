@@ -34,6 +34,14 @@ def main():
     dataloader1 = torch.utils.data.DataLoader(X1, batch_size=64, shuffle=True)
     dataloader0 = torch.utils.data.DataLoader(X0, batch_size=64, shuffle=True)
 
+    net_score = Unet()
+    model_score = NCSN(net_score, L=10, device=args.device)
+    optimizer_score = torch.optim.Adam(net_score.parameters(), 1e-2)
+    model_score.train(optimizer_score, epochs=1, dataloader=dataloader1, print_interval=10)
+    gen_score_samples, hist_score = model_score.sample_from(X0[:10])
+
+    show_images(gen_score_samples, title="Score Matching Samples")
+
     net_fm = Unet()
     model_FM = GaussFlowMatching_OT(net_fm, device=args.device)
     optimizer_fm = torch.optim.Adam(net_fm.parameters(), 1e-2)
@@ -44,13 +52,7 @@ def main():
     show_images(gen_FM_samples, title="FM Samples", save_path="outputs/gen_FM_samples.png")
 
 
-    net_score = Unet()
-    model_score = NCSN(net_score, L=10, device=args.device)
-    optimizer_score = torch.optim.Adam(net_score.parameters(), 1e-2)
-    model_score.train(optimizer_score, epochs=1, dataloader=dataloader1, print_interval=10)
-    gen_score_samples, hist_score = model_score.sample_from(X0[:10])
 
-    show_images(gen_score_samples, title="Score Matching Samples")
 
 if __name__ == "__main__":
     main()

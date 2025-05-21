@@ -40,7 +40,6 @@ class NCSN:
 
             for batch in dataloader:
                 x = batch[0] if isinstance(batch, (list, tuple)) else batch
-                print(x.shape)
                 x = x.to(self.device)
 
                 batch_size = x.size(0)
@@ -48,6 +47,9 @@ class NCSN:
                 sigma_level = self.sigma[sigma_level_idx].unsqueeze(1)
 
                 noise = torch.randn_like(x)
+                # adapt this to the size of x
+                sigma_level = sigma_level.unsqueeze(1).unsqueeze(2)
+
                 x_perturbed = x + sigma_level * noise
 
                 optimizer.zero_grad()

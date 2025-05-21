@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from net.NoiseNet import NoiseUnet
 
 class NoiseLearner:
     def __init__(self, model, L=10, sigma_low=0.01, sigma_high=1, device=None):
@@ -7,6 +8,7 @@ class NoiseLearner:
         self.L = L
         self.device = device if device is not None else torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
+        self.degradator = NoiseUnet()
 
         # Generate a sequence of noise levels
         sigma = [sigma_high]
@@ -49,11 +51,11 @@ class NoiseLearner:
                 noise = torch.randn_like(x)
                 # noise = self.NoiseNet(x, sigma_level)
 
-                x_degradated = self.degradator(x, sigma_level)
+                x_degradated = self.degradator(x, sigma_level, noise)
 
                 optimizer.zero_grad()
-                noise_predicted = -self.model(x_degradated, sigma_level)
-                loss = ((noise - noise_predicted) ** 2).mean()
+                recon_pred = self.reconstructor(x_degradated, sigma_level)
+                loss = ((x - recon_pred) ** 2).mean()
 
                 loss.backward()
                 optimizer.step()
