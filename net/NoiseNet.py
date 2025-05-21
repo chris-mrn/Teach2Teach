@@ -435,7 +435,7 @@ class NoiseUnet(nn.Module):
                  num_midc_layers:int = 2,
                  num_upc_layers:int = 2
                 ):
-        super(Unet, self).__init__()
+        super(NoiseUnet, self).__init__()
 
         self.im_channels = im_channels
         self.down_ch = down_ch
@@ -501,8 +501,8 @@ class NoiseUnet(nn.Module):
 
         out = self.cv1(x)
 
-        # Time Projection
         t = t[:, 0, 0, 0]
+
         t_emb = get_time_embedding(t, self.t_emb_dim)
         t_emb = self.t_proj(t_emb)
 
@@ -527,6 +527,7 @@ class NoiseUnet(nn.Module):
 
         #linear combination
 
+        t = t.view(-1, 1, 1, 1)
         out_interpolate = (1-t)*eps + t*(1-t)*out + t*x
 
         return out_interpolate

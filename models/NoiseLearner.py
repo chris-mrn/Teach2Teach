@@ -8,8 +8,8 @@ class NoiseLearner:
         self.degrad = degrad
         self.L = L
         self.device = device if device is not None else torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model.to(self.device)
-        self.degradator = NoiseUnet()
+        self.recon.to(self.device)
+        self.degrad.to(self.device)
 
         # Generate a sequence of noise levels
         sigma = [sigma_high]
@@ -35,8 +35,9 @@ class NoiseLearner:
         return x_step, x_hist
 
     def train(self, optimizer, epochs, dataloader, print_interval=1):
-        print("Training NCSN...")
-        self.model.train()
+        print("Training Noise Learner...")
+        self.recon.train()
+        self.degrad.train()
 
         for epoch in range(epochs):
             total_loss = 0.0
@@ -52,6 +53,7 @@ class NoiseLearner:
 
                 noise = torch.randn_like(x)
                 # noise = self.NoiseNet(x, sigma_level)
+                sigma_level = sigma_level.unsqueeze(1).unsqueeze(2)
 
                 x_degradated = self.degrad(x, sigma_level, noise)
 
