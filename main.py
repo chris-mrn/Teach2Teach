@@ -37,7 +37,7 @@ def main():
     net_fm = Unet()
     model_FM = GaussFlowMatching_OT(net_fm, device=args.device)
     optimizer_fm = torch.optim.Adam(net_fm.parameters(), 1e-2)
-    model_FM.train(optimizer_fm, dataloader1 , dataloader0 , n_epochs=1)
+    model_FM.train(optimizer_fm, dataloader1 , dataloader0 , n_epochs=15)
     gen_FM_samples, hist_FM = model_FM.sample_from(X0[:10])
 
     # Show and save FM samples

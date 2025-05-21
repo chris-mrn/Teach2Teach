@@ -47,10 +47,12 @@ class NoiseLearner:
                 sigma_level = self.sigma[sigma_level_idx].unsqueeze(1)
 
                 noise = torch.randn_like(x)
-                x_perturbed = x + sigma_level * noise
+                # noise = self.NoiseNet(x, sigma_level)
+
+                x_degradated = self.degradator(x, sigma_level)
 
                 optimizer.zero_grad()
-                noise_predicted = -self.model(x_perturbed, sigma_level)
+                noise_predicted = -self.model(x_degradated, sigma_level)
                 loss = ((noise - noise_predicted) ** 2).mean()
 
                 loss.backward()

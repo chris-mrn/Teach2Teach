@@ -12,11 +12,7 @@ class GaussFlowMatching_OT:
         print("Training flow matching...")
 
         for epoch in range(n_epochs):
-            c = 0
             for x1, x0 in zip(X1_loader, X0_loader):
-                c += 1
-                print(c)
-                print(c/len(X1_loader))
                 x0 = x0.to(self.device)
                 x1 = x1.to(self.device)
 
