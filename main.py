@@ -31,7 +31,7 @@ def main():
     X1 = mnist_data.data.unsqueeze(1)
     # transform X1 to normalize it and put it to float
     X1 = X1 / 255.0
-    X1 = X1.float()[:1000]
+    X1 = X1.float()
     X0 = torch.rand_like(torch.Tensor(X1))
 
     dataloader1 = torch.utils.data.DataLoader(X1, batch_size=64, shuffle=True)
@@ -56,8 +56,13 @@ def main():
 
     net_noise = NoiseUnet()
     net_recon = Unet()
-    model = NoiseLearner(net_noise, net_recon, L=10, device=args.device)
-
+    model = NoiseLearner(net_recon, net_noise, L=10, device=args.device)
+    # optimize of the parameters of net_recon and net_noise
+    optimizer = torch.optim.Adam(list(net_recon.parameters()) + list(net_noise.parameters()), 1e-3)
+    model.train(optimizer, epochs=10, dataloader=dataloader1, print_interval=10)
+    gen_samples, hist = model.sample_from(X0[:10])
+    # Show and save samples
+    show_images(gen_samples, title="Noise Learner Samples", save_path="outputs/gen_samples.png")
 
 if __name__ == "__main__":
     main()

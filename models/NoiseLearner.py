@@ -3,8 +3,9 @@ import numpy as np
 from net.NoiseNet import NoiseUnet
 
 class NoiseLearner:
-    def __init__(self, model, L=10, sigma_low=0.01, sigma_high=1, device=None):
-        self.model = model
+    def __init__(self, recon, degrad,  L=10, sigma_low=0.01, sigma_high=1, device=None):
+        self.recon = recon
+        self.degrad = degrad
         self.L = L
         self.device = device if device is not None else torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
@@ -26,10 +27,8 @@ class NoiseLearner:
                 alpha_i = eps * self.sigma[i] ** 2 / self.sigma[-1] ** 2
                 for _ in range(T):
                     noise_level = self.sigma[i].expand(x_step.shape[0], 1)
-                    print(noise_level.shape)
                     noise_level = noise_level.view(-1, 1, 1, 1)
-                    print(noise_level.shape)
-                    x_step = x_step + alpha_i / 2 * self.model(x_step, noise_level) / noise_level \
+                    x_step = x_step + alpha_i / 2 * self.recon(x_step, noise_level) / noise_level \
                              + torch.sqrt(alpha_i) * torch.randn_like(x_step)
                 x_hist[i + 1] = x_step
 
@@ -54,10 +53,10 @@ class NoiseLearner:
                 noise = torch.randn_like(x)
                 # noise = self.NoiseNet(x, sigma_level)
 
-                x_degradated = self.degradator(x, sigma_level, noise)
+                x_degradated = self.degrad(x, sigma_level, noise)
 
                 optimizer.zero_grad()
-                recon_pred = self.reconstructor(x_degradated, sigma_level)
+                recon_pred = self.recon(x_degradated, sigma_level)
                 loss = ((x - recon_pred) ** 2).mean()
 
                 loss.backward()
