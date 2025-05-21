@@ -40,7 +40,7 @@ def main():
     net_score = Unet()
     model_score = NCSN(net_score, L=10, device=args.device)
     optimizer_score = torch.optim.Adam(net_score.parameters(), 1e-3)
-    model_score.train(optimizer_score, epochs=10, dataloader=dataloader1, print_interval=10)
+    model_score.train(optimizer_score, epochs=1, dataloader=dataloader1, print_interval=10)
     gen_score_samples, hist_score = model_score.sample_from(X0[:10])
 
 
@@ -51,7 +51,7 @@ def main():
     gen_FM_samples, hist_FM = model_FM.sample_from(X0[:10])
 
     # Show and save FM samples
-    show_images(gen_score_samples, title="Score Matching Samples")
+    show_images(gen_score_samples, title="Score Matching Samples", save_path="outputs/gen_NCSN_samples.png")
     show_images(gen_FM_samples, title="FM Samples", save_path="outputs/gen_FM_samples.png")
 
     net_noise = NoiseUnet()
