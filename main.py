@@ -34,6 +34,15 @@ def main():
     dataloader1 = torch.utils.data.DataLoader(X1, batch_size=64, shuffle=True)
     dataloader0 = torch.utils.data.DataLoader(X0, batch_size=64, shuffle=True)
 
+    net_fm = Unet()
+    model_FM = GaussFlowMatching_OT(net_fm, device=args.device)
+    optimizer_fm = torch.optim.Adam(net_fm.parameters(), 1e-3)
+    model_FM.train(optimizer_fm, dataloader1 , dataloader0 , n_epochs=10)
+    gen_FM_samples, hist_FM = model_FM.sample_from(X0[:10])
+
+    # Show and save FM samples
+    show_images(gen_FM_samples, title="FM Samples", save_path="outputs/gen_FM_samples.png")
+
     net_score = Unet()
     model_score = NCSN(net_score, L=10, device=args.device)
     optimizer_score = torch.optim.Adam(net_score.parameters(), 1e-2)
@@ -41,16 +50,6 @@ def main():
     gen_score_samples, hist_score = model_score.sample_from(X0[:10])
 
     show_images(gen_score_samples, title="Score Matching Samples")
-
-    net_fm = Unet()
-    model_FM = GaussFlowMatching_OT(net_fm, device=args.device)
-    optimizer_fm = torch.optim.Adam(net_fm.parameters(), 1e-2)
-    model_FM.train(optimizer_fm, dataloader1 , dataloader0 , n_epochs=15)
-    gen_FM_samples, hist_FM = model_FM.sample_from(X0[:10])
-
-    # Show and save FM samples
-    show_images(gen_FM_samples, title="FM Samples", save_path="outputs/gen_FM_samples.png")
-
 
 
 
