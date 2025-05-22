@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from net.NoiseNet import NoiseUnet
+import matplotlib.pyplot as plt
 
 class NoiseLearner:
     def __init__(self, recon, degrad,  L=10, sigma_low=0.01, sigma_high=1, device=None):
@@ -42,7 +43,7 @@ class NoiseLearner:
         for epoch in range(epochs):
             total_loss = 0.0
             total_batches = 0
-
+            c = 0
             for batch in dataloader:
                 x = batch[0] if isinstance(batch, (list, tuple)) else batch
                 x = x.to(self.device)
@@ -57,8 +58,13 @@ class NoiseLearner:
 
                 x_degradated = self.degrad(x, sigma_level, noise)
 
+
+                print((c/len(dataloader))*100)
+
                 optimizer.zero_grad()
                 recon_pred = self.recon(x_degradated, sigma_level)
+
+
                 loss = ((x - recon_pred) ** 2).mean()
 
                 loss.backward()
