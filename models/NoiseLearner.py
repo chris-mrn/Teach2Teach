@@ -52,17 +52,27 @@ class NoiseLearner:
                 sigma_level_idx = torch.randint(0, self.L, (batch_size,), device=self.device)
                 sigma_level = self.sigma[sigma_level_idx].unsqueeze(1)
 
+                print(sigma_level[0])
+
                 noise = torch.randn_like(x)
                 # noise = self.NoiseNet(x, sigma_level)
                 sigma_level = sigma_level.unsqueeze(1).unsqueeze(2)
 
+                #plt.imshow(x[0].detach().numpy().squeeze(), cmap='gray')
+                #plt.show()
+
                 x_degradated = self.degrad(x, sigma_level, noise)
 
+                #plt.imshow(x_degradated[0].detach().numpy().squeeze(), cmap='gray')
+                #plt.show()
 
-                print((c/len(dataloader))*100)
+
 
                 optimizer.zero_grad()
                 recon_pred = self.recon(x_degradated, sigma_level)
+
+                #plt.imshow(recon_pred[0].detach().numpy().squeeze(), cmap='gray')
+                #plt.show()
 
 
                 loss = ((x - recon_pred) ** 2).mean()

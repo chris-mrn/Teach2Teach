@@ -528,6 +528,6 @@ class NoiseUnet(nn.Module):
         #linear combination
 
         t = t.view(-1, 1, 1, 1)
-        out_interpolate = (1-t)*eps + t*(1-t)*out + t*x
+        out_interpolate = t*eps + t*(1-t)*out + (1-t)*x
 
-        return  out
+        return out_interpolate
