@@ -54,6 +54,7 @@ class NoiseLearner:
             total_batches = 0
             c = 0
             for batch in dataloader:
+                c +=1
                 x = batch[0] if isinstance(batch, (list, tuple)) else batch
                 x = x.to(self.device)
 
@@ -75,7 +76,8 @@ class NoiseLearner:
                 loss_discr =  torch.log(1 - self.discrm(x_degradated, x)).mean()
 
 
-                loss = loss_recon + loss_discr
+                loss = loss_recon + 0.1*loss_discr
+                # print the loss
 
 
                 loss.backward()
@@ -85,6 +87,9 @@ class NoiseLearner:
                 total_loss_recon += loss_recon
                 total_loss_discr += total_loss_discr
                 total_batches += 1
+
+                if c % 100 == 0 :
+                    print(total_loss, total_loss_recon, total_loss_discr)
 
             if epoch % print_interval == 0:
                 avg_loss = total_loss
