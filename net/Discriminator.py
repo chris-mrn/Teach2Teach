@@ -17,8 +17,6 @@ class Discriminator(nn.Module):
         flat_x = x.view(self.batch_size, -1)  # Flatten the input image
         flat_y = y.view(self.batch_size, -1)
         flat = flat_x - flat_y
-        # print the shapes of flat_x, flat_y, and flat
-        print(f"flat_x shape: {flat_x.shape}, flat_y shape: {flat_y.shape}, flat shape: {flat.shape}")
         layer1 = self.LReLu(self.fc1(flat))  # Apply Leaky ReLU to the first fully connected layer
         out = self.SigmoidL(self.fc2(layer1))  # Apply Sigmoid to the second fully connected layer
         return out.view(-1, 1).squeeze(1)  # Flatten the output and remove unnecessary dimension

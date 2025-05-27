@@ -60,10 +60,10 @@ class NoiseLearner:
 
                 print(sigma_level[0])
 
+                print(x.shape)
                 noise = torch.randn_like(x)
                 # noise = self.NoiseNet(x, sigma_level)
                 sigma_level = sigma_level.unsqueeze(1).unsqueeze(2)
-
 
                 x_degradated = self.degrad(x, sigma_level, noise)
 
