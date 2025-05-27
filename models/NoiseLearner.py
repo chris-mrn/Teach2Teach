@@ -28,7 +28,7 @@ class NoiseLearner:
         x_hist[0] = x_step
 
         with torch.no_grad():
-            for i in range(self.L):
+            for i in range(self.L-1):
                 alpha_i = eps * self.sigma[i] ** 2 / self.sigma[-1] ** 2
                 for _ in range(T):
                     noise_level = self.sigma[i].expand(x_step.shape[0], 1)
