@@ -49,6 +49,8 @@ class NoiseLearner:
 
         for epoch in range(epochs):
             total_loss = 0.0
+            total_loss_recon = 0.0
+            total_loss_discr = 0.0
             total_batches = 0
             c = 0
             for batch in dataloader:
@@ -76,13 +78,12 @@ class NoiseLearner:
                 loss = loss_recon + loss_discr
 
 
-
                 loss.backward()
                 optimizer.step()
 
                 total_loss += loss.item()
-                total_loss_recon += loss_recon.item()
-                total_loss_discr += total_loss_discr.item()
+                total_loss_recon += loss_recon
+                total_loss_discr += total_loss_discr
                 total_batches += 1
 
             if epoch % print_interval == 0:
