@@ -62,7 +62,7 @@ def main():
     model = NoiseLearner(net_recon, net_noise, net_discr, L=10, device=args.device)
     # optimize of the parameters of net_recon and net_noise
     optimizer = torch.optim.Adam(list(net_recon.parameters()) + list(net_noise.parameters()), 1e-3)
-    model.train(optimizer, epochs=7, dataloader=dataloader1, print_interval=10)
+    model.train(optimizer, epochs=10, dataloader=dataloader1, print_interval=10)
     gen_samples, hist = model.sample_from(X0[:10])
     # Show and save samples
     show_images(gen_samples, title="Noise Learner Samples", save_path="outputs/gen_samples.png")

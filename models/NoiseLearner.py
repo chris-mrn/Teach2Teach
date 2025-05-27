@@ -23,6 +23,7 @@ class NoiseLearner:
 
     def sample_from(self, X0, T=100, eps=2e-5):
         x_step = X0.to(self.device)
+        noise =  torch.randn_like(x_step)
         x_hist = torch.zeros(self.L + 1, *x_step.shape, device=self.device)
         x_hist[0] = x_step
 
@@ -34,7 +35,7 @@ class NoiseLearner:
                     noise_level = noise_level.view(-1, 1, 1, 1)
                     next_noise_level = self.sigma[i + 1].expand(x_step.shape[0], 1)
                     next_noise_level = next_noise_level.view(-1, 1, 1, 1)
-                    x_step = self.degrad(self.recon(x_step, noise_level), next_noise_level)
+                    x_step = self.degrad(self.recon(x_step, noise_level), next_noise_level, noise)
 
                 x_hist[i + 1] = x_step
 
