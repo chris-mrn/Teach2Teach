@@ -2,15 +2,18 @@ import torch
 import numpy as np
 from net.NoiseNet import NoiseUnet
 import matplotlib.pyplot as plt
+from net.Discriminator import Discriminator
 
 class NoiseLearner:
-    def __init__(self, recon, degrad,  L=10, sigma_low=0.01, sigma_high=1, device=None):
+    def __init__(self, recon, degrad, discrm, L=10, sigma_low=0.01, sigma_high=1, device=None):
         self.recon = recon
         self.degrad = degrad
+        self.discrm = discrm
         self.L = L
         self.device = device if device is not None else torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.recon.to(self.device)
         self.degrad.to(self.device)
+        self.discrm.to(self.device)
 
         # Generate a sequence of noise levels
         sigma = [sigma_high]
@@ -29,8 +32,10 @@ class NoiseLearner:
                 for _ in range(T):
                     noise_level = self.sigma[i].expand(x_step.shape[0], 1)
                     noise_level = noise_level.view(-1, 1, 1, 1)
-                    x_step = x_step + alpha_i / 2 * self.recon(x_step, noise_level) / noise_level \
-                             + torch.sqrt(alpha_i) * torch.randn_like(x_step)
+                    next_noise_level = self.sigma[i + 1].expand(x_step.shape[0], 1)
+                    next_noise_level = next_noise_level.view(-1, 1, 1, 1)
+                    x_step = self.degrad(self.recon(x_step, noise_level), next_noise_level)
+
                 x_hist[i + 1] = x_step
 
         return x_step, x_hist
@@ -39,6 +44,7 @@ class NoiseLearner:
         print("Training Noise Learner...")
         self.recon.train()
         self.degrad.train()
+        self.discrm.train()
 
         for epoch in range(epochs):
             total_loss = 0.0
@@ -58,24 +64,15 @@ class NoiseLearner:
                 # noise = self.NoiseNet(x, sigma_level)
                 sigma_level = sigma_level.unsqueeze(1).unsqueeze(2)
 
-                #plt.imshow(x[0].detach().numpy().squeeze(), cmap='gray')
-                #plt.show()
 
                 x_degradated = self.degrad(x, sigma_level, noise)
-
-                #plt.imshow(x_degradated[0].detach().numpy().squeeze(), cmap='gray')
-                #plt.show()
-
-
 
                 optimizer.zero_grad()
                 recon_pred = self.recon(x_degradated, sigma_level)
 
-                #plt.imshow(recon_pred[0].detach().numpy().squeeze(), cmap='gray')
-                #plt.show()
 
 
-                loss = ((x - recon_pred) ** 2).mean()
+                loss = ((x - recon_pred) ** 2).mean() + torch.log(1 - self.discrm(x_degradated, x)).mean()
 
                 loss.backward()
                 optimizer.step()
