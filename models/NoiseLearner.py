@@ -74,6 +74,7 @@ class NoiseLearner:
                 # Loss reconstruction
                 loss_recon = ((x - recon_pred) ** 2).mean()
                 loss_discr =  torch.log(1 - self.discrm(x_degradated, x)).mean()
+                loss_discr = 0
 
 
                 loss = loss_recon + 0.1*loss_discr
