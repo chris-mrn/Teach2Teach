@@ -21,7 +21,7 @@ class NoiseLearner:
             sigma.append(sigma[-1] * (sigma_low / sigma_high) ** (1 / (L - 1)))
         self.sigma = torch.tensor(sigma, device=self.device)
 
-    def sample_from(self, X0, T=100, eps=2e-5):
+    def sample_from(self, X0, T=5, eps=2e-5):
         x_step = X0.to(self.device)
         noise =  torch.randn_like(x_step)
         x_hist = torch.zeros(self.L + 1, *x_step.shape, device=self.device)
@@ -40,6 +40,7 @@ class NoiseLearner:
                 x_hist[i + 1] = x_step
 
         return x_step, x_hist
+    
 
     def train(self, optimizer, epochs, dataloader, print_interval=1):
         print("Training Noise Learner...")
@@ -77,7 +78,7 @@ class NoiseLearner:
                 loss_discr = 0
 
 
-                loss = loss_recon + 0.1*loss_discr
+                loss = loss_recon + loss_discr
                 # print the loss
 
 
