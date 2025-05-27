@@ -89,7 +89,7 @@ class NoiseLearner:
                 total_loss_discr += total_loss_discr
                 total_batches += 1
 
-                if c % 100 == 0 :
+                if c % 10 == 0 :
                     print(total_loss, total_loss_recon, total_loss_discr)
 
             if epoch % print_interval == 0:
