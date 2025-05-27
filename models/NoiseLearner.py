@@ -65,6 +65,8 @@ class NoiseLearner:
                 # noise = self.NoiseNet(x, sigma_level)
                 sigma_level = sigma_level.unsqueeze(1).unsqueeze(2)
 
+                # print the shapes of the inputs
+                print(f"Batch {c} - x shape: {x.shape}, sigma_level shape: {sigma_level.shape}, noise shape: {noise.shape}")
                 x_degradated = self.degrad(x, sigma_level, noise)
 
                 optimizer.zero_grad()
