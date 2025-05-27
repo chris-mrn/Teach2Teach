@@ -58,31 +58,35 @@ class NoiseLearner:
                 batch_size = x.size(0)
                 sigma_level_idx = torch.randint(0, self.L, (batch_size,), device=self.device)
                 sigma_level = self.sigma[sigma_level_idx].unsqueeze(1)
-
-                print(sigma_level[0])
-
-                print(x.shape)
                 noise = torch.randn_like(x)
                 # noise = self.NoiseNet(x, sigma_level)
                 sigma_level = sigma_level.unsqueeze(1).unsqueeze(2)
 
-                # print the shapes of the inputs
-                print(f"Batch {c} - x shape: {x.shape}, sigma_level shape: {sigma_level.shape}, noise shape: {noise.shape}")
+
                 x_degradated = self.degrad(x, sigma_level, noise)
 
                 optimizer.zero_grad()
                 recon_pred = self.recon(x_degradated, sigma_level)
 
+                # Loss reconstruction
+                loss_recon = ((x - recon_pred) ** 2).mean()
+                loss_discr =  torch.log(1 - self.discrm(x_degradated, x)).mean()
 
 
-                loss = ((x - recon_pred) ** 2).mean() + torch.log(1 - self.discrm(x_degradated, x)).mean()
+                loss = loss_recon + loss_discr
+
+
 
                 loss.backward()
                 optimizer.step()
 
                 total_loss += loss.item()
+                total_loss_recon += loss_recon.item()
+                total_loss_discr += total_loss_discr.item()
                 total_batches += 1
 
             if epoch % print_interval == 0:
-                avg_loss = total_loss / total_batches
-                print(f"Epoch {epoch + 1}/{epochs} - Avg Loss: {avg_loss:.6f}")
+                avg_loss = total_loss
+                avg_loss_recon = total_loss_recon / total_batches
+                avg_loss_discr = total_loss_discr / total_batches
+                print(f"Epoch {epoch + 1}/{epochs} - Avg Loss: {avg_loss:.6f} - Recon Loss: {loss_recon:.6f} - Discr Loss: {avg_loss_discr:.6f}")
