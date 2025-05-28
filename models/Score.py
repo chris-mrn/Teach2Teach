@@ -67,3 +67,7 @@ class NCSN:
             if epoch % print_interval == 0:
                 avg_loss = total_loss / total_batches
                 print(f"Epoch {epoch + 1}/{epochs} - Avg Loss: {avg_loss:.6f}")
+
+class Score : 
+    def __init__(self):
+        pass

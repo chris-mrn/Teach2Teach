@@ -5,8 +5,8 @@ from net.unet import Unet
 from net.NoiseNet import NoiseUnet
 from net.Discriminator import Discriminator
 from models.Flow import GaussFlowMatching_OT
-from models.Score import NCSN
-from models.NoiseLearner import NoiseLearner, ConsitencyNoiseLearner
+from models.Score import NCSN, Score
+from models.NoiseLearner import NoiseLearner, CNoiseLearner
 import torchvision.transforms as transforms
 from utils import parse_arguments, show_images
 
@@ -59,7 +59,7 @@ def main():
     net_noise = NoiseUnet()
     net_recon = Unet()
     net_discr = Discriminator(batch_size=64)
-    model = ConsitencyNoiseLearner(net_recon, net_noise, net_discr, L=10, device=args.device)
+    model = CNoiseLearner(net_recon, net_noise, net_discr, L=10, device=args.device)
     # optimize of the parameters of net_recon and net_noise
     optimizer = torch.optim.Adam(list(net_recon.parameters()) + list(net_noise.parameters()), 1e-3)
     model.train(optimizer, epochs=6, dataloader=dataloader1, print_interval=10)
